@@ -7,6 +7,7 @@ CREATE TABLE customer(
     first_name VARCHAR(300) NOT NULL DEFAULT '',
     last_name VARCHAR(300) NOT NULL DEFAULT '',
     email VARCHAR(300) NOT NULL DEFAULT '',
+    status VARCHAR(300) NOT NULL  DEFAULT 'REGULAR',
     PRIMARY KEY (id)
 );
 
