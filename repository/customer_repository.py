@@ -1,13 +1,28 @@
 from typing import Optional, List
 
+import json
+
 from model.customer import Customer
 from model.customer_status import CustomerStatus
+from repository import cache_repository
 from repository.database import database
 
 
 async def get_by_id(customer_id: int) -> Optional[Customer]:
-    query = "SELECT * FROM customer WHERE id=:customer_id"
-    return await database.fetch_one(query, values={"customer_id": customer_id})
+    if cache_repository.is_key_exists(str(customer_id)):
+        string_customer = cache_repository.get_cache_entity(str(customer_id))
+        customer_data = json.loads(string_customer)
+        return Customer(**customer_data)
+    else:
+        query = "SELECT * FROM customer WHERE id=:customer_id"
+        result = await database.fetch_one(query, values={"customer_id": customer_id})
+        if result:
+            customer = Customer(**result)
+            cache_repository.create_cache_entity(str(customer_id), customer.json())
+            return customer
+        else:
+            return None
+
 
 
 async def get_all() -> List[Customer]:
